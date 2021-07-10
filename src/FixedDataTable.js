@@ -1130,7 +1130,8 @@ class FixedDataTable extends React.Component {
       scrollFlags,
       scrollX,
       scrollY,
-      scrolling,
+      firstRowIndex,
+      endRowIndex,
     } = this.props;
     const { overflowX, overflowY } = scrollFlags;
 
@@ -1142,7 +1143,11 @@ class FixedDataTable extends React.Component {
       y = y > maxScrollY ? maxScrollY : y;
 
       //NOTE (jordan) This is a hacky workaround to prevent FDT from setting its internal state
-      if (onVerticalScroll ? onVerticalScroll(y) : true) {
+      if (
+        onVerticalScroll
+          ? onVerticalScroll(y, firstRowIndex, endRowIndex)
+          : true
+      ) {
         scrollActions.scrollToY(y);
       }
     } else if (deltaX && overflowX !== 'hidden') {
@@ -1188,13 +1193,23 @@ class FixedDataTable extends React.Component {
   };
 
   _scrollToY = (/*number*/ scrollPos) => {
-    const { onVerticalScroll, scrollActions, scrollY } = this.props;
+    const {
+      onVerticalScroll,
+      scrollActions,
+      scrollY,
+      firstRowIndex,
+      endRowIndex,
+    } = this.props;
 
     if (scrollPos === scrollY) {
       return;
     }
 
-    if (onVerticalScroll ? onVerticalScroll(scrollPos) : true) {
+    if (
+      onVerticalScroll
+        ? onVerticalScroll(scrollPos, firstRowIndex, endRowIndex)
+        : true
+    ) {
       scrollActions.scrollToY(scrollPos);
     }
   };
@@ -1211,6 +1226,8 @@ class FixedDataTable extends React.Component {
       onVerticalScroll,
       tableSize: { ownerHeight },
       scrolling,
+      firstRowIndex,
+      endRowIndex,
     } = this.props;
 
     const {
@@ -1244,7 +1261,7 @@ class FixedDataTable extends React.Component {
     }
 
     if (scrollYChanged && onVerticalScroll) {
-      onVerticalScroll(scrollY);
+      onVerticalScroll(scrollY, firstRowIndex, endRowIndex);
     }
 
     // debounced version of didScrollStop as we don't immediately stop scrolling
